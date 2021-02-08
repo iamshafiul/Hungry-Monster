@@ -11,12 +11,16 @@ const getMealsByKeyword = (keyword) => {
         .then(data => data.meals);
 };
 
+//meal detail
 const getMealById = (id) => {
     return fetch(`${API_URL}/lookup.php?i=${id}`)
         .then(res => res.json())
         .then(data => data.meals[0]);
 };
 
+
+
+//display meals 
 const displayMeals = () => {
     searchForm.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -24,20 +28,27 @@ const displayMeals = () => {
         let keyword = document.getElementById('search').value;
         let meals = await getMealsByKeyword(keyword);
 
-        meals.forEach(meal => {
-            let mealBox = mealBoxTemplate.content.cloneNode(true);
+        //validation
+        if (keyword === "" || !isNaN(keyword)) {
+            document.getElementById('error').innerHTML = "Result is not found";
+        } else {
+            meals.forEach(meal => {
+                let mealBox = mealBoxTemplate.content.cloneNode(true);
 
-            mealBox.querySelector('.card-img-top').src = meal.strMealThumb;
-            mealBox.querySelector('.card-title').innerHTML = meal.strMeal;
-            mealBox.querySelector('.card-link').setAttribute('onClick', 'displayMealDetail(' + meal.idMeal + ')');
-            mealBoxContainer.appendChild(mealBox);
-        });
+                mealBox.querySelector('.card-img-top').src = meal.strMealThumb;
+                mealBox.querySelector('.card-title').innerHTML = meal.strMeal;
+                mealBox.querySelector('.card-link').setAttribute('onClick', 'displayMealDetail(' + meal.idMeal + ')');
+                mealBoxContainer.appendChild(mealBox);
+            });
+
+        }
+
+
     });
 };
 
 const displayMealDetail = async(id) => {
     let meal = await getMealById(id);
-
     mealBoxModal.querySelector('.meal-img').src = meal.strMealThumb;
     mealBoxModal.querySelector('.meal-title, .modal-title').innerHTML = meal.strMeal;
     mealBoxModal.querySelector('.meal-category').innerHTML = '<b>Category: </b>' + meal.strCategory;
